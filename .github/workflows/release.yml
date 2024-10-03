@@ -30,6 +30,10 @@ jobs:
           install-only: true
           version: latest
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20.11.0"
+
       - name: Generate Version
         id: version
         env:
@@ -44,10 +48,6 @@ jobs:
         run: |
           make build-plugins
           make gen-plugin-index
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20.11.0"
 
       - name: Release
         env:
