@@ -1,0 +1,24 @@
+---
+branches:
+- main
+
+tagFormat: "${version}"
+
+plugins:
+- - "@semantic-release/commit-analyzer"
+  - preset: angular
+    releaseRules:
+    - message: "*major*"
+      release: major
+    - message: "*minor*"
+      release: minor
+    - message: "*"
+      release: patch
+    - scope: no-release
+      release: false
+- - "@semantic-release/github"
+  - assets:
+    - path: "./dist/executor_*"
+    - path: "./plugins-index.yaml"
+releaseNotes:
+  template: "## Release {{version}}\n\n{{#each commits}}- {{this.message}}\n{{/each}}"

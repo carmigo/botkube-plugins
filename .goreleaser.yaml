@@ -3,9 +3,9 @@ before:
     - go mod download
 
 builds:
-  - id: echo
-    main: cmd/echo/main.go
-    binary: executor_echo_{{ .Os }}_{{ .Arch }}
+  - id: job
+    main: cmd/job/main.go
+    binary: executor_job_{{ .Os }}_{{ .Arch }}
 
     no_unique_dist_dir: true
     env: &env
@@ -18,37 +18,21 @@ builds:
       - arm64
     goarm: &goarm
       - 7
-
-  - id: msg
-    main: cmd/msg/main.go
-    binary: executor_msg_{{ .Os }}_{{ .Arch }}
-
-    no_unique_dist_dir: true
-    env: *env
-    goos: *goos
-    goarch: *goarch
-    goarm: *goarm
-
-  - id: ticker
-    main: cmd/ticker/main.go
-    binary: source_ticker_{{ .Os }}_{{ .Arch }}
+  - id: snippet
+    main: cmd/snippet/main.go
+    binary: executor_snippet_{{ .Os }}_{{ .Arch }}
 
     no_unique_dist_dir: true
-    env: *env
-    goos: *goos
-    goarch: *goarch
-    goarm: *goarm
-
-  - id: forwarder
-    main: cmd/forwarder/main.go
-    binary: source_forwarder_{{ .Os }}_{{ .Arch }}
-
-    no_unique_dist_dir: true
-    env: *env
-    goos: *goos
-    goarch: *goarch
-    goarm: *goarm
-
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    goarm:
+      - 7
 snapshot:
   name_template: 'v{{ .Version }}'
 

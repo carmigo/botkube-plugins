@@ -2,15 +2,18 @@ name: Deploy Botkube plugins on GitHub Release
 
 on:
   push:
-    tags:
-      - '*'
+    branches:
+      - main
 
 jobs:
   release:
     name: Release
-    runs-on: ubuntu-latest
+    runs-on: codebuild-carmigo-botkube-plugins-${{ github.run_id }}-${{ github.run_attempt }}
     permissions:
-      contents: write
+      contents: write # to be able to publish a GitHub release
+      issues: write # to be able to comment on released issues
+      pull-requests: write # to be able to comment on released pull requests
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -33,36 +36,14 @@ jobs:
         run: |
           make build-plugins
           make gen-plugin-index
-      - name: Release description
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20.11.0"
+
+      - name: Release
         env:
-          PLUGIN_DOWNLOAD_URL_BASE_PATH: "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          cat << EOF > release.md
-
-          Botkube Plugins **${GITHUB_REF#refs/tags/}** version are now available! :rocket:
-
-          To use plugins from this release, configure Botkube with:
-          EOF
-          cat << 'EOF' >> release.md
-
-          ```yaml
-          plugins:
-            repositories:
-          EOF
-          cat << EOF >> release.md
-              ${{ github.event.repository.name }}:
-                url: ${PLUGIN_DOWNLOAD_URL_BASE_PATH}/plugins-index.yaml
-          EOF
-          cat << 'EOF' >> release.md
-          ```
-          EOF
-
-      - name: Publish GitHub release
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release create "${GITHUB_REF#refs/tags/}" \
-          --notes-file release.md \
-          ./dist/source_* \
-          ./dist/executor_* \
-          ./plugins-index.yaml
+          npm install
+          npx semantic-release
