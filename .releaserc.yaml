@@ -16,6 +16,8 @@ plugins:
       release: patch
     - scope: no-release
       release: false
+- - "@semantic-release/exec"
+  - verifyReleaseCmd: 'echo NEXT_RELEASE_VERSION=actions-runner-${nextRelease.version} >> $GITHUB_OUTPUT'
 - - "@semantic-release/github"
   - assets:
     - path: "./dist/executor_*"

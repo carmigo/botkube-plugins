@@ -30,9 +30,17 @@ jobs:
           install-only: true
           version: latest
 
+      - name: Generate Version
+        id: version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          npm install
+          npx semantic-release --dry-run --no-ci
+
       - name: Build plugins and generate plugins index.yaml
         env:
-          PLUGIN_DOWNLOAD_URL_BASE_PATH: "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}"
+          PLUGIN_DOWNLOAD_URL_BASE_PATH: "https://github.com/${{ github.repository }}/releases/download/${{ steps.version.outputs.NEXT_RELEASE_VERSION }}"
         run: |
           make build-plugins
           make gen-plugin-index
@@ -45,5 +53,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npm install
           npx semantic-release
