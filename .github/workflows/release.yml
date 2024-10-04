@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
+
 
 jobs:
   release:
@@ -34,13 +38,18 @@ jobs:
         with:
           node-version: "20.11.0"
 
-      - name: Generate Version
+      - name: Generate version
         id: version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          npm install
-          npx semantic-release --dry-run --no-ci
+          if [[ "${{ github.event_name == 'pull_request' }}" == "true" ]]
+          then
+            echo NEXT_RELEASE_VERSION=$(git rev-parse --short "$GITHUB_SHA") >> $GITHUB_OUTPUT
+          else
+            npm install
+            npx semantic-release --dry-run --no-ci
+          fi
 
       - name: Build plugins and generate plugins index.yaml
         env:
@@ -50,6 +59,7 @@ jobs:
           make gen-plugin-index
 
       - name: Release
+        if: github.event_name != 'pull_request'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
