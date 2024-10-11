@@ -342,7 +342,7 @@ func showBothSelects(ctx context.Context, envs map[string]string, details stateD
 					for _, value := range values {
 						dropdownOptions = append(dropdownOptions, api.OptionItem{
 							Name:  value,
-							Value: fmt.Sprintf("%s %s", option.Flag, value),
+							Value: value,
 						})
 					}
 
@@ -356,7 +356,7 @@ func showBothSelects(ctx context.Context, envs map[string]string, details stateD
 					if option.Default != "" {
 						initialOption = &api.OptionItem{
 							Name:  option.Default,
-							Value: fmt.Sprintf("%s %s", option.Flag, option.Default),
+							Value: option.Default,
 						}
 					} else {
 						initialOption = nil // Set to nil if Default is not set
@@ -442,8 +442,8 @@ func buildFinalCommand(options []Arg, namespace string, details stateDetails) st
 		flagKey := fmt.Sprintf("%s-%s", details.job, option.Flag)
 		part := fmt.Sprintf("%s %s",option.Flag, details.params[flagKey])
 		if option.Type == "bool" {
-			if strings.Fields(details.params[flagKey])[1] == "true" {
-				part = strings.Fields(details.params[flagKey])[0]
+			if details.params[flagKey] == "true" {
+				part = details.params[flagKey]
 			} else {
 				continue
 			}
