@@ -443,7 +443,7 @@ func buildFinalCommand(options []Arg, namespace string, details stateDetails) st
 		part := fmt.Sprintf("%s %s",option.Flag, details.params[flagKey])
 		if option.Type == "bool" {
 			if details.params[flagKey] == "true" {
-				part = details.params[flagKey]
+				part = option.Flag
 			} else {
 				continue
 			}
